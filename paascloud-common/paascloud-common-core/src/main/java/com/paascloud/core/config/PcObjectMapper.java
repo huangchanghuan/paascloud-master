@@ -11,6 +11,7 @@
 
 package com.paascloud.core.config;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -42,7 +43,8 @@ public class PcObjectMapper {
 				.registerModule(new ParameterNamesModule())
 				.registerModule(new Jdk8Module())
 				.registerModule(new JavaTimeModule())
-				.registerModule(simpleModule);
+				.registerModule(simpleModule)
+				.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		jackson2HttpMessageConverter.setObjectMapper(objectMapper);
 		converters.add(jackson2HttpMessageConverter);
