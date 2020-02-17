@@ -813,7 +813,7 @@ public class UacUserServiceImpl extends BaseService<UacUser> implements UacUserS
 		final String browser = userAgent.getBrowser().getName();
 		final String remoteAddr = RequestUtil.getRemoteAddr(request);
 		// 根据IP获取位置信息
-		final String remoteLocation = opcRpcService.getLocationById(remoteAddr);
+//		final String remoteLocation = opcRpcService.getLocationById(remoteAddr);
 		final String requestURI = request.getRequestURI();
 
 		UacUser uacUser = new UacUser();
@@ -821,7 +821,7 @@ public class UacUserServiceImpl extends BaseService<UacUser> implements UacUserS
 		uacUser.setLastLoginIp(remoteAddr);
 		uacUser.setId(userId);
 		uacUser.setLastLoginTime(new Date());
-		uacUser.setLastLoginLocation(remoteLocation);
+//		uacUser.setLastLoginLocation(remoteLocation);
 		LoginAuthDto loginAuthDto = new LoginAuthDto(userId, principal.getLoginName(), principal.getNickName(), principal.getGroupId(), principal.getGroupName());
 		// 记录token日志
 		String accessToken = token.getValue();
@@ -835,7 +835,7 @@ public class UacUserServiceImpl extends BaseService<UacUser> implements UacUserS
 		log.setGroupId(principal.getGroupId());
 		log.setGroupName(principal.getGroupName());
 		log.setIp(remoteAddr);
-		log.setLocation(remoteLocation);
+//		log.setLocation(remoteLocation);
 		log.setOs(os);
 		log.setBrowser(browser);
 		log.setRequestUrl(requestURI);

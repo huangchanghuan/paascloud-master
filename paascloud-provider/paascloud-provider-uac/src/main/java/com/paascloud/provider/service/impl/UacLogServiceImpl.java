@@ -45,7 +45,7 @@ public class UacLogServiceImpl extends BaseService<UacLog> implements UacLogServ
 			uacLog.setActionName(uacAction.getActionName());
 		}
 		uacLog.setUpdateInfo(loginAuthDto);
-		uacLog.setId(this.generateId());
+//		uacLog.setId(this.generateId());
 		return uacLogMapper.insertSelective(uacLog);
 	}
 

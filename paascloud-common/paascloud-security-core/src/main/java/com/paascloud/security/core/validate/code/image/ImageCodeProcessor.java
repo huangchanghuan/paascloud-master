@@ -22,7 +22,7 @@ import org.springframework.web.context.request.ServletWebRequest;
 import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
+import java.io.*;
 import java.util.Map;
 
 /**
@@ -58,12 +58,52 @@ public class ImageCodeProcessor extends AbstractValidateCodeProcessor<ImageCode>
 	protected void send(ServletWebRequest request, ImageCode imageCode) throws Exception {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		ImageIO.write(imageCode.getImage(), "JPEG", bos);
+		byte[] bfile = bos.toByteArray();
 
-		SecurityResult result = SecurityResult.ok(bos.toByteArray());
-
+		SecurityResult result = SecurityResult.ok(bfile);
+		getFile(bfile, "C:\\Users\\Administrator\\Desktop", "test.jpg");
 		String json = objectMapper.writeValueAsString(result);
 		HttpServletResponse response = request.getResponse();
 		response.setCharacterEncoding("UTF-8");
 		response.getWriter().write(json);
 	}
+
+	/**根据byte[] 数组生成文件  （在本地）
+	 * @param bfile  字节数组
+	 * @param filePath 文件路径
+	 * @param fileName 文件名
+	 */
+	public static void getFile(byte[] bfile, String filePath,String fileName) {
+		BufferedOutputStream bos = null;  //带缓冲得文件输出流
+		FileOutputStream fos = null;      //文件输出流
+		File file = null;
+		try {
+			File dir = new File(filePath);
+			if(!dir.exists()&&dir.isDirectory()){//判断文件目录是否存在
+				dir.mkdirs();
+			}
+			file = new File(filePath+"\\"+fileName);  //文件路径+文件名
+			fos = new FileOutputStream(file);
+			bos = new BufferedOutputStream(fos);
+			bos.write(bfile);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (bos != null) {
+				try {
+					bos.close();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			}
+			if (fos != null) {
+				try {
+					fos.close();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			}
+		}
+	}
+
 }

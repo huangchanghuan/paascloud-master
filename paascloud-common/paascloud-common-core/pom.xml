@@ -23,7 +23,10 @@
             <groupId>com.liuzm.paascloud.common</groupId>
             <artifactId>paascloud-common-util</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+        </dependency>
         <dependency>
             <groupId>tk.mybatis</groupId>
             <artifactId>mapper</artifactId>

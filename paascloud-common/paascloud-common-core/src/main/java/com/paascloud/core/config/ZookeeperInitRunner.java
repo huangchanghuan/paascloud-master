@@ -27,8 +27,8 @@ import java.net.InetAddress;
  *
  * @author paascloud.net @gmail.com
  */
-@Component
-@Order
+//@Component
+//@Order
 @Slf4j
 public class ZookeeperInitRunner implements CommandLineRunner {
 	@Resource

@@ -51,6 +51,7 @@ public class TokenInterceptor implements HandlerInterceptor {
 	private static final String AUTH_PATH1 = "/auth";
 	private static final String AUTH_PATH2 = "/oauth";
 	private static final String AUTH_PATH3 = "/error";
+	//feign类型请求不走地址约定为api,不需要认证
 	private static final String AUTH_PATH4 = "/api";
 
 	/**

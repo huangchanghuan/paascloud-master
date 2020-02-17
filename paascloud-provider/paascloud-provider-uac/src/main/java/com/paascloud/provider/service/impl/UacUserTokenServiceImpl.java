@@ -77,7 +77,7 @@ public class UacUserTokenServiceImpl extends BaseService<UacUserToken> implement
 		final String browser = userAgent.getBrowser().getName();
 		final String remoteAddr = RequestUtil.getRemoteAddr(request);
 		// 根据IP获取位置信息
-		final String remoteLocation = opcRpcService.getLocationById(remoteAddr);
+//		final String remoteLocation = opcRpcService.getLocationById(remoteAddr);
 
 		// 存入mysql数据库
 		UacUserToken uacUserToken = new UacUserToken();
@@ -89,7 +89,7 @@ public class UacUserTokenServiceImpl extends BaseService<UacUserToken> implement
 		uacUserToken.setAccessToken(accessToken);
 		uacUserToken.setAccessTokenValidity(accessTokenValidateSeconds);
 		uacUserToken.setLoginIp(remoteAddr);
-		uacUserToken.setLoginLocation(remoteLocation);
+//		uacUserToken.setLoginLocation(remoteLocation);
 		uacUserToken.setLoginTime(uacUser.getLastLoginTime());
 		uacUserToken.setLoginName(loginAuthDto.getLoginName());
 		uacUserToken.setRefreshToken(refreshToken);
@@ -100,7 +100,8 @@ public class UacUserTokenServiceImpl extends BaseService<UacUserToken> implement
 		uacUserToken.setUpdateInfo(loginAuthDto);
 		uacUserToken.setGroupId(loginAuthDto.getGroupId());
 		uacUserToken.setGroupName(loginAuthDto.getGroupName());
-		uacUserToken.setId(generateId());
+//		uacUserToken.setId(generateId());
+//		uacUserToken.setId(1L);
 		uacUserTokenMapper.insertSelective(uacUserToken);
 		UserTokenDto userTokenDto = new ModelMapper().map(uacUserToken, UserTokenDto.class);
 		// 存入redis数据库

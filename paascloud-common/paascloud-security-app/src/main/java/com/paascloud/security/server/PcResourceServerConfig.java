@@ -98,10 +98,20 @@ public class PcResourceServerConfig extends ResourceServerConfigurerAdapter {
 	 */
 	@Override
 	public void configure(HttpSecurity http) throws Exception {
+
+
+		//默认用户名密码登录,图片验证码
 		formAuthenticationConfig.configure(http);
+
+
 		http.headers().frameOptions().disable();
+
+		//加入validateCodeFilter
 		http.apply(validateCodeSecurityConfig)
+
+
 				.and()
+				//计入手机短信验证码
 				.apply(smsCodeAuthenticationSecurityConfig)
 				.and()
 				.apply(pcSocialSecurityConfig)
