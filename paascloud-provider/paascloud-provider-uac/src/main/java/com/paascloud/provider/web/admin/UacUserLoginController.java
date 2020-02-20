@@ -26,13 +26,20 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.common.exceptions.UnapprovedClientAuthenticationException;
 import org.springframework.security.oauth2.provider.ClientDetails;
 import org.springframework.security.oauth2.provider.ClientDetailsService;
+import org.springframework.security.oauth2.provider.TokenRequest;
+import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.security.Principal;
+import java.util.HashSet;
+import java.util.Map;
 
 
 /**
@@ -94,7 +101,7 @@ public class UacUserLoginController extends BaseController {
 	 * @param request      the request
 	 * @param refreshToken the refresh token
 	 * @param accessToken  the access token
-	 *
+	 *new TokenRequest(requestParameters,tokens[0],token.getScope(),"refresh_token"
 	 * @return the wrapper
 	 */
 	@GetMapping(value = "/auth/user/refreshToken")
@@ -129,5 +136,13 @@ public class UacUserLoginController extends BaseController {
 		}
 		return WrapMapper.ok(token);
 	}
-
+	@Resource
+	private AuthorizationServerTokenServices authorizationServerTokenServices;
+	@RequestMapping(value = "/user/myRefresh", method=RequestMethod.POST)
+	public Wrapper<OAuth2AccessToken> postAccessToken(Principal principal, @RequestParam
+			Map<String, String> parameters){
+		OAuth2AccessToken token =authorizationServerTokenServices.refreshAccessToken(parameters.get("refresh_token"),
+				new TokenRequest(parameters,parameters.get("client_id"),new HashSet<>(),"refresh_token"));
+				return WrapMapper.ok(token);
+	}
 }

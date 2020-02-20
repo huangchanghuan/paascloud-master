@@ -22,6 +22,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -77,6 +79,18 @@ public class PcAuthenticationSuccessHandler extends SavedRequestAwareAuthenticat
 		OAuth2Authentication oAuth2Authentication = new OAuth2Authentication(oAuth2Request, authentication);
 
 		OAuth2AccessToken token = authorizationServerTokenServices.createAccessToken(oAuth2Authentication);
+//		Map<String, String> requestParameters = new HashMap<>();
+//		requestParameters.put("grant_type", "refresh_token");
+//		requestParameters.put("client_id", tokens[0]);
+//		requestParameters.put("client_secret", tokens[1]);
+//		requestParameters.put("refresh_token", token.getRefreshToken().getValue());
+//		System.out.println(token.getValue());
+//		System.out.println(token.getRefreshToken().getValue());
+//		token =authorizationServerTokenServices.refreshAccessToken(token.getRefreshToken().getValue(),
+//				new TokenRequest(requestParameters,tokens[0],token.getScope(),"refresh_token"));
+//		System.out.println(token.getValue());
+//		System.out.println(token.getRefreshToken().getValue());
+
 		SecurityUser principal = (SecurityUser) authentication.getPrincipal();
 		uacUserService.handlerLoginData(token, principal, request);
 

@@ -55,6 +55,7 @@ public class PcAuthorizationServerConfig extends AuthorizationServerConfigurerAd
 	public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
 		security.tokenKeyAccess("permitAll()");
 		security.allowFormAuthenticationForClients();
+
 	}
 
 	/**

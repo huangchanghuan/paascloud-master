@@ -99,7 +99,6 @@ public class PcResourceServerConfig extends ResourceServerConfigurerAdapter {
 	@Override
 	public void configure(HttpSecurity http) throws Exception {
 
-
 		//默认用户名密码登录,图片验证码
 		formAuthenticationConfig.configure(http);
 
@@ -130,5 +129,6 @@ public class PcResourceServerConfig extends ResourceServerConfigurerAdapter {
 	@Override
 	public void configure(ResourceServerSecurityConfigurer resources) {
 		resources.expressionHandler(pcSecurityExpressionHandler);
+
 	}
 }

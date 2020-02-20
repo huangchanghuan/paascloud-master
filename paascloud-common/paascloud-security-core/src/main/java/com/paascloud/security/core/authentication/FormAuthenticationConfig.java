@@ -2,10 +2,15 @@ package com.paascloud.security.core.authentication;
 
 import com.paascloud.security.core.properties.SecurityConstants;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
 
 /**
  * 表单登录配置
@@ -50,6 +55,12 @@ public class FormAuthenticationConfig {
 				.loginProcessingUrl(SecurityConstants.DEFAULT_SIGN_IN_PROCESSING_URL_FORM)
 				.successHandler(pcAuthenticationSuccessHandler)
 				.failureHandler(pcAuthenticationFailureHandler);
+		DefaultUserDetailsServiceImpl defaultUserDetailsService = new DefaultUserDetailsServiceImpl();
+		defaultUserDetailsService.setUserDetailsService(userDetailsService);
+		AuthenticationManagerBuilder bui = (AuthenticationManagerBuilder) http.getSharedObjects().get(AuthenticationManagerBuilder.class);
+		bui.userDetailsService(defaultUserDetailsService).passwordEncoder(new BCryptPasswordEncoder());
 	}
 
+	@Autowired
+	private UserDetailsService userDetailsService;
 }
