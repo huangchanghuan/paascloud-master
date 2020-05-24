@@ -102,8 +102,12 @@ public class MqProducerStoreAspect {
 		} else if (type == MqSendTypeEnum.DIRECT_SEND) {
 			mqMessageService.directSendMessage(domain);
 		} else {
-			final MqMessageData finalDomain = domain;
-			taskExecutor.execute(() -> mqMessageService.confirmAndSendMessage(finalDomain.getMessageKey()));
+			//这里会有问题？
+			// 1.本地事务还没提交，把确认消息放进线程池执行了
+			// 2. 本地事务提交后，再把确认消息放进线程池执行
+//			final MqMessageData finalDomain = domain;
+//			taskExecutor.execute(() -> mqMessageService.confirmAndSendMessage(finalDomain.getMessageKey()));
+			mqMessageService.confirmAndSendMessage(domain.getMessageKey());
 		}
 		return result;
 	}

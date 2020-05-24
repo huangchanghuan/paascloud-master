@@ -492,7 +492,9 @@ public final class ZookeeperRegistryCenter implements CoordinatorRegistryCenter 
 		if (StringUtils.isNotEmpty(producerGroup)) {
 			dto = new ReliableMessageRegisterDto().setProducerGroup(producerGroup).setNamesrvAddr(namesrvAddr);
 			String producerJson = JSON.toJSONString(dto);
+			//维护微服务名路径  ： 生产者id 之间的关系
 			this.persist(producerRootPath, producerJson);
+			//微服务名路径下， 用ip作为子文件夹 ， 值为当前时间
 			this.persistEphemeral(producerRootPath + GlobalConstant.Symbol.SLASH + host, DateUtil.now());
 		}
 		// 注册消费者

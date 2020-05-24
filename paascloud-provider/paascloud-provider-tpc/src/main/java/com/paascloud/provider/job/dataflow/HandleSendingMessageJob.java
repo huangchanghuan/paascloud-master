@@ -47,7 +47,7 @@ public class HandleSendingMessageJob extends AbstractBaseDataflowJob<TpcMqMessag
 	private int timeOutMinute;
 	@Value("${paascloud.message.maxSendTimes}")
 	private int messageMaxSendTimes;
-
+	//重发时间间隔系数，默认是一分钟 * 系数
 	@Value("${paascloud.message.resendMultiplier}")
 	private int messageResendMultiplier;
 	@Resource
@@ -69,6 +69,12 @@ public class HandleSendingMessageJob extends AbstractBaseDataflowJob<TpcMqMessag
 		query.setShardingItem(jobParameter.getShardingItem());
 		query.setShardingTotalCount(jobParameter.getShardingTotalCount());
 		query.setTaskStatus(JobTaskStatusEnum.TASK_CREATE.status());
+		//    AND message.task_status = #{taskStatus} 创建任务数据， 这里是不是可以放宽限制，因为elestic job是分片，所以之前处理异常时候，这里是TASK_EXETING(2, "正在处理中"),所以也适合查出来处理
+		//    AND message.message_status = #{messageStatus}  已发送20
+		//    AND message.created_time &lt; #{createTimeBefore} 多少时间前创建的（超时时间内没完成的消息，配置5分钟）
+		//    AND message.yn = 0 未删除的
+		//    ORDER BY update_time 最旧的数据排前面，之前处理过的排在后面（根据这个字段计算是否满足间隔时间重发）
+		//    LIMIT ${fetchNum} 每次处理查询数量
 		return tpcMqMessageService.listMessageForWaitingProcess(query);
 	}
 
@@ -84,13 +90,17 @@ public class HandleSendingMessageJob extends AbstractBaseDataflowJob<TpcMqMessag
 
 			Integer resendTimes = message.getResendTimes();
 			if (resendTimes >= messageMaxSendTimes) {
+				//超过重发次数,设置dead 1-死亡，task_status=4，处理失败 ， 需要人工处理了
 				tpcMqMessageService.setMessageToAlreadyDead(message.getId());
 				continue;
 			}
-
+			//todo 为什么要系数， 新的times
 			int times = (resendTimes == 0 ? 1 : resendTimes) * messageResendMultiplier;
+			//当前时间，毫秒
 			long currentTimeInMillis = Calendar.getInstance().getTimeInMillis();
+			//第一次的的时间，毫秒， 每次是60秒重发一次
 			long needTime = currentTimeInMillis - times * 60 * 1000;
+			//消息的更新时间
 			long hasTime = message.getUpdateTime().getTime();
 			// 判断是否达到了可以再次发送的时间条件
 			if (hasTime > needTime) {
@@ -104,6 +114,7 @@ public class HandleSendingMessageJob extends AbstractBaseDataflowJob<TpcMqMessag
 			message.setPreStatusList(preStatusList);
 			message.setTaskStatus(JobTaskStatusEnum.TASK_EXETING.status());
 			int updateRes = tpcMqMessageService.updateMqMessageTaskStatus(message);
+			//更新状态成功
 			if (updateRes > 0) {
 				try {
 
@@ -112,12 +123,15 @@ public class HandleSendingMessageJob extends AbstractBaseDataflowJob<TpcMqMessag
 					int count = tpcMqConfirmMapper.selectUnConsumedCount(message.getMessageKey());
 					int status = JobTaskStatusEnum.TASK_CREATE.status();
 					if (count < 1) {
+						//消费者确认了消费，tpc_mq_confirm状态为30
+						//更新tpc_mq_message表状态为30
 						TpcMqMessage update = new TpcMqMessage();
 						update.setMessageStatus(MqSendStatusEnum.FINISH.sendStatus());
 						update.setId(message.getId());
 						tpcMqMessageService.updateMqMessageStatus(update);
 						status = JobTaskStatusEnum.TASK_SUCCESS.status();
 					} else {
+						//消费者还没有确认消费，重发消息
 						tpcMqMessageService.resendMessageByMessageId(message.getId());
 					}
 
@@ -132,7 +146,7 @@ public class HandleSendingMessageJob extends AbstractBaseDataflowJob<TpcMqMessag
 					// 设置任务状态为执行中
 					preStatusList = Lists.newArrayList(JobTaskStatusEnum.TASK_EXETING.status());
 					message.setPreStatusList(preStatusList);
-					message.setTaskStatus(JobTaskStatusEnum.TASK_SUCCESS.status());
+					message.setTaskStatus(JobTaskStatusEnum.TASK_CREATE.status());
 					tpcMqMessageService.updateMqMessageTaskStatus(message);
 				}
 			}

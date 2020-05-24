@@ -60,13 +60,18 @@ public class MqProducerChangeListener implements TreeCacheListener {
 		switch (event.getType()) {
 			case NODE_ADDED:
 				log.info("MqProducerChangeListener CHILD_ADDED path={}, data={}", path, dataStr);
+				//  路径 /paascloud/registry/producer/app/ip
 				if (split.length == GlobalConstant.Number.SIX_INT) {
+					//微服务路径：生产者唯一id  /paascloud/registry/producer/app
 					String appPath = path.substring(0, path.lastIndexOf(GlobalConstant.Symbol.SLASH));
-
 					ReliableMessageRegisterDto dto = JSON.parseObject(getDirectly(client, appPath), ReliableMessageRegisterDto.class);
 					if (this.getNumChildren(client, appPath) > 0) {
+						//存在子节点ip文件夹
+						//根据pid更新生产者组在线状态
 						tpcMqProducerService.updateOnLineStatusByPid(dto.getProducerGroup());
+						//创建pid对应的mq生产者对象
 						MqProducerBeanFactory.buildProducerBean(dto);
+						//在线pid
 						MqProducerBeanFactory.putPid(dto.getProducerGroup());
 					}
 				}
@@ -75,10 +80,11 @@ public class MqProducerChangeListener implements TreeCacheListener {
 				log.info("MqProducerChangeListener NODE_REMOVED path={}, data={}", path, dataStr);
 				if (split.length == GlobalConstant.Number.SIX_INT) {
 					String appPath = path.substring(0, path.lastIndexOf(GlobalConstant.Symbol.SLASH));
-
 					ReliableMessageRegisterDto dto = JSON.parseObject(getDirectly(client, appPath), ReliableMessageRegisterDto.class);
 					if (this.getNumChildren(client, appPath) < 1) {
+						//如果子节点都删除了，则生产者组下线状态
 						tpcMqProducerService.updateOffLineStatusByPid(dto.getProducerGroup());
+						//去除pid
 						MqProducerBeanFactory.rmPid(dto.getProducerGroup());
 					}
 				}

@@ -72,14 +72,21 @@ public class HandleWaitingConfirmMessageJob extends AbstractBaseDataflowJob<Stri
 	 */
 	@Override
 	protected void processJobData(List<String> messageKeyList) {
+		//未发送的消息
 		if (messageKeyList == null) {
 			return;
 		}
+
+		//查询已提交的事务
+		//todo 根据服务名访问服务
 		List<String> resendMessageList = uacRpcService.queryWaitingConfirmMessageKeyList(messageKeyList);
 		if (resendMessageList == null) {
 			resendMessageList = Lists.newArrayList();
 		}
+
+		//剩下不需要发送的
 		messageKeyList.removeAll(resendMessageList);
+		//删除 和 重新发送
 		tpcMqMessageService.handleWaitingConfirmMessage(messageKeyList, resendMessageList);
 	}
 }

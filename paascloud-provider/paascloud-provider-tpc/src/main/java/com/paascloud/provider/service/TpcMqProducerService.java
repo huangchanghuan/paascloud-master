@@ -53,7 +53,7 @@ public interface TpcMqProducerService extends IService<TpcMqProducer> {
 
 	/**
 	 * 根据pid更新生产者状态为在线.
-	 *
+	 * 	 *
 	 * @param producerGroup the producer group
 	 */
 	void updateOnLineStatusByPid(String producerGroup);
