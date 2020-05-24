@@ -119,7 +119,8 @@ public class HandleSendingMessageJob extends AbstractBaseDataflowJob<TpcMqMessag
 				try {
 
 					// 查询是否全部订阅者都确认了消息 是 则更新消息状态完成, 否则重发消息
-
+					//    FROM pc_tpc_mq_confirm
+					//    WHERE status in (10, 20) AND message_key = #{messageKey}
 					int count = tpcMqConfirmMapper.selectUnConsumedCount(message.getMessageKey());
 					int status = JobTaskStatusEnum.TASK_CREATE.status();
 					if (count < 1) {

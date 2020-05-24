@@ -96,6 +96,7 @@ public class TpcMqMessageServiceImpl extends BaseService<TpcMqMessage> implement
 		// 创建消费待确认列表
 		this.createMqConfirmListByTopic(message.getMessageTopic(), message.getId(), message.getMessageKey());
 		// 直接发送消息
+		//todo 这里改成自定义注解aop，在事务提交后，再发送到mq
 		this.directSendMessage(message.getMessageBody(), message.getMessageTopic(), message.getMessageTag(), message.getMessageKey(), message.getProducerGroup(), message.getDelayLevel());
 	}
 
