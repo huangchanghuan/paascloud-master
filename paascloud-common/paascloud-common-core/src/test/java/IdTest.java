@@ -44,4 +44,6 @@ public class IdTest {
         log.info(" end generate id ");
 		log.info("* cost " + (end - start) + " ms!");
     }
+
+
 }
